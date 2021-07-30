@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
+const util = require('util');
 
 require('dotenv').config();
 
@@ -15,3 +16,13 @@ const db = mysql.createConnection(
     },
     console.log(`Connected to the books_db database.`)
   );
+
+const query = util.promisify(db.query).bind(db);
+
+const selectAllEmployees = async () => {
+    const results = await query("SELECT * FROM employees");
+    await console.log("async function");
+    await console.table(results);
+};
+
+selectAllEmployees();
