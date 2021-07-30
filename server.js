@@ -59,7 +59,7 @@ const askNextAction = async () => {
             break;
 
         case "View All Departments":
-            break;
+            return viewAllDepartments();
 
         case "Add a Department":
             break;
@@ -74,6 +74,10 @@ const viewAllRoles = async () => {
     return console.table(results);
 };
 
+const viewAllDepartments = async () => {
+    const results = await query("SELECT id, name AS deparment FROM departments;");
+    return console.table(results);
+};
 
 // stand-in init function
 askNextAction();
