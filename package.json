@@ -1,0 +1,30 @@
+{
+  "name": "Employee-Management-System",
+  "version": "1.0.0",
+  "description": "A command line application to help  view and manage the departments, roles, and employees in a company",
+  "main": "server.js",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "inquirer": "^8.1.2",
+    "mysql2": "^2.2.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "watch": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdrianCronin/Employee-Management-System.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AdrianCronin/Employee-Management-System/issues"
+  },
+  "homepage": "https://github.com/AdrianCronin/Employee-Management-System#readme"
+}
