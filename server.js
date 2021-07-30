@@ -19,14 +19,6 @@ const db = mysql.createConnection(
 
 const query = util.promisify(db.query).bind(db);
 
-// how to do async delete later
-// const selectAllEmployees = async () => {
-//     const results = await query("SELECT * FROM employees");
-//     await console.log("async function");
-//     await console.table(results);
-// };
-
-
 const nextActionList = [
     {
         type: 'list',
@@ -52,32 +44,35 @@ const askNextAction = async () => {
 
     switch (nextActionAnswer.choice) {
         case "View All Employees":
-
             break;
+
         case "Add an Employee":
-
             break;
+
         case "Update Employee Role":
-
             break;
+
         case "View All Roles":
+            return viewAllRoles();
 
-            break;
         case "Add a Role":
-
             break;
+
         case "View All Departments":
-
             break;
+
         case "Add a Department":
-
             break;
-        case "Quit":
 
+        case "Quit":
             break;
     };
 };
 
+const viewAllRoles = async () => {
+    const results = await query("SELECT roles.id, roles.title, departments.name AS department, roles.salary FROM roles JOIN departments ON roles.department_id = departments.id");
+    return console.table(results);
+};
 
 
 // stand-in init function
