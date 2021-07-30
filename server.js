@@ -40,11 +40,11 @@ const nextActionList = [
 const askNextAction = async () => {
     const nextActionAnswer = await inquirer.prompt(nextActionList);
 
-    await console.log(nextActionAnswer.choice);
+    console.log(nextActionAnswer.choice);
 
     switch (nextActionAnswer.choice) {
         case "View All Employees":
-            break;
+            return viewAllEmployees();
 
         case "Add an Employee":
             break;
@@ -65,18 +65,26 @@ const askNextAction = async () => {
             break;
 
         case "Quit":
-            break;
+            return;
     };
 };
 
 const viewAllRoles = async () => {
     const results = await query("SELECT roles.id, roles.title, departments.name AS department, roles.salary FROM roles JOIN departments ON roles.department_id = departments.id");
-    return console.table(results);
+    console.table(results);
+    return askNextAction();
 };
 
 const viewAllDepartments = async () => {
     const results = await query("SELECT id, name AS deparment FROM departments;");
-    return console.table(results);
+    console.table(results);
+    return askNextAction();
+};
+
+const viewAllEmployees = async () => {
+    const results = await query("");
+    console.table(results);
+    return askNextAction();
 };
 
 // stand-in init function
