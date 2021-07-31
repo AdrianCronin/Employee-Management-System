@@ -48,7 +48,7 @@ const askNextAction = async () => {
             return viewAllEmployees();
 
         case "Add an Employee":
-            break;
+            return addEmployee();
 
         case "Update Employee Role":
             break;
@@ -108,7 +108,7 @@ const addDepartment = async () => {
     return askNextAction;
 };
 
-const createAddRoleChoices = async () => {
+const createAddRoleDepartmentChoices = async () => {
     const results = await query("SELECT id, name AS department FROM departments;");
     const choices = [];
 
@@ -121,7 +121,7 @@ const createAddRoleChoices = async () => {
 
 const addRole = async () => {
 
-    const choices = await createAddRoleChoices();
+    const choices = await createAddRoleDepartmentChoices();
 
     const newRoleQuestions = [
         {
@@ -152,5 +152,59 @@ const addRole = async () => {
     return askNextAction();
 };
 
+const createAddEmployeeRoleChoices = async () => {
+    const results = await query("SELECT id, title FROM roles;");
+    const choices = [];
+    
+    for (const element of results) {
+        choices.push(element.title)
+    };
+    
+    return choices
+};
+
+// const createAddEmployeeManagerChoices = async () => {
+//     const results = await query("SELECT "
+// };
+
+const addEmployee = async () => {
+
+    const roleChoices = await createAddEmployeeRoleChoices();
+    // const managerChoices = createAddEmployeeManagerChoices();
+
+    const newEmployeeQuestions = [
+        {
+            type: 'input',
+            message: "What is the employee's first name?",
+            name: 'firstName',
+        },
+        {
+            type: 'input',
+            message: "What is the employee's Last name?",
+            name: 'lastName',
+        },
+        {
+            type: 'list',
+            message: "What is the employee's role?",
+            name: 'role',
+            choices: roleChoices
+        },
+        // {
+        //     type: 'list',
+        //     message: "Who is the employee's manager?",
+        //     name: 'manager',
+        //     choices: ""
+        // },
+        
+
+    ];
+
+    const {firstName, lastName, role} = await inquirer.prompt(newEmployeeQuestions);
+
+    await console.log(firstName, lastName, role);
+};
+
 // stand-in init function
 askNextAction();
+
+
