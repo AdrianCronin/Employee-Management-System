@@ -14,7 +14,7 @@ const db = mysql.createConnection(
       password: process.env.DB_PASS,
       database: 'employees_db'
     },
-    console.log(`Connected to the books_db database.`)
+    console.log(`Connected to the employees_db database.`)
   );
 
 const query = util.promisify(db.query).bind(db);
@@ -82,7 +82,12 @@ const viewAllDepartments = async () => {
 };
 
 const viewAllEmployees = async () => {
-    const results = await query("");
+    const results = await query(`
+    SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.name AS department, roles.salary, employees.manager_id AS manager
+
+    FROM employees
+    JOIN roles ON employees.role_id = roles.id
+    INNER JOIN departments ON roles.department_id = departments.id`);
     console.table(results);
     return askNextAction();
 };
