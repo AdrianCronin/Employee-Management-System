@@ -62,7 +62,7 @@ const askNextAction = async () => {
             return viewAllDepartments();
 
         case "Add a Department":
-            break;
+            return addDepartment();
 
         case "Quit":
             return;
@@ -90,6 +90,21 @@ const viewAllEmployees = async () => {
     INNER JOIN departments ON roles.department_id = departments.id`);
     console.table(results);
     return askNextAction();
+};
+
+const addDepartment = async () => {
+    
+    const department = await inquirer.prompt([
+        {
+            type: 'input',
+            message: 'What is the name of the Department?',
+            name: "name"
+        }
+    ]);
+
+    await query(`INSERT INTO departments (name) VALUES (?)`, department.name.trim());
+    await viewAllDepartments();
+    return askNextAction;
 };
 
 // stand-in init function
