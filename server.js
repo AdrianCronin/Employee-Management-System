@@ -37,6 +37,7 @@ const nextActionList = [
     }
 ];
 
+
 const askNextAction = async () => {
     const nextActionAnswer = await inquirer.prompt(nextActionList);
 
@@ -56,7 +57,7 @@ const askNextAction = async () => {
             return viewAllRoles();
 
         case "Add a Role":
-            break;
+            return addRole();
 
         case "View All Departments":
             return viewAllDepartments();
@@ -76,7 +77,7 @@ const viewAllRoles = async () => {
 };
 
 const viewAllDepartments = async () => {
-    const results = await query("SELECT id, name AS deparment FROM departments;");
+    const results = await query("SELECT id, name AS department FROM departments;");
     console.table(results);
     return askNextAction();
 };
@@ -93,7 +94,7 @@ const viewAllEmployees = async () => {
 };
 
 const addDepartment = async () => {
-    
+
     const department = await inquirer.prompt([
         {
             type: 'input',
@@ -105,6 +106,50 @@ const addDepartment = async () => {
     await query(`INSERT INTO departments (name) VALUES (?)`, department.name.trim());
     await viewAllDepartments();
     return askNextAction;
+};
+
+const createAddRoleChoices = async () => {
+    const results = await query("SELECT id, name AS department FROM departments;");
+    const choices = [];
+
+    for (const element of results) {
+        choices.push(element.department)
+    };
+
+    return choices
+};
+
+const addRole = async () => {
+
+    const choices = await createAddRoleChoices();
+
+    const newRoleQuestions = [
+        {
+            type: 'input',
+            message: "What is the role's title?",
+            name: 'title',
+        },
+        {
+            type: 'input',
+            message: "What is this role's salary?",
+            name: 'salary',
+        },
+        {
+            type: 'list',
+            message: "Which department does this role belong to?",
+            name: 'department',
+            choices: choices
+        },
+    ];
+
+    const {title, salary, department} = await inquirer.prompt(newRoleQuestions);
+
+    const departmentQuery = await query(`SELECT id FROM departments WHERE name = (?)`, department );
+    const departmentId = departmentQuery[0].id
+
+    await query(`INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)`, [title, parseInt(salary), departmentId]);
+    await viewAllRoles();
+    return askNextAction();
 };
 
 // stand-in init function
