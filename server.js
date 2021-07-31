@@ -163,9 +163,18 @@ const createAddEmployeeRoleChoices = async () => {
     return choices
 };
 
-// const createAddEmployeeManagerChoices = async () => {
-//     const results = await query("SELECT "
-// };
+const createAddEmployeeManagerChoices = async () => {
+    const results = await query("SELECT * FROM employees");
+    const choices = [];
+
+    for (const element of results) {
+        choices.push(`${element.first_name} ${element.last_name}`)
+    };
+
+    choices.push(null);
+
+    console.log(choices);
+};
 
 const addEmployee = async () => {
 
@@ -201,10 +210,12 @@ const addEmployee = async () => {
 
     const {firstName, lastName, role} = await inquirer.prompt(newEmployeeQuestions);
 
-    await console.log(firstName, lastName, role);
+    console.log(firstName, lastName, role);
 };
 
 // stand-in init function
-askNextAction();
+// askNextAction();
+
+createAddEmployeeManagerChoices();
 
 
