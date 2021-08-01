@@ -84,11 +84,17 @@ const viewAllDepartments = async () => {
 
 const viewAllEmployees = async () => {
     const results = await query(`
-    SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.name AS department, roles.salary, employees.manager_id AS manager
+    SELECT
+        e1.id, e1.first_name, e1.last_name, roles.title, departments.name AS department, roles.salary,
+        IFNULL(NULL, CONCAT(e2.first_name, " ", e2.last_name)) AS manager
 
-    FROM employees
-    JOIN roles ON employees.role_id = roles.id
-    INNER JOIN departments ON roles.department_id = departments.id`);
+    FROM employees e1
+    
+    JOIN roles ON e1.role_id = roles.id
+
+    JOIN departments ON roles.department_id = departments.id
+
+    LEFT JOIN employees e2 ON e2.id = e1.manager_id;`);
     console.table(results);
     return askNextAction();
 };
@@ -163,23 +169,35 @@ const createAddEmployeeRoleChoices = async () => {
     return choices
 };
 
-const createAddEmployeeManagerChoices = async () => {
+// TODO: Finish this
+const createEmployeeArray = async () => {
+
     const results = await query("SELECT * FROM employees");
-    const choices = [];
+    const employeesArr = [];
 
     for (const element of results) {
-        choices.push(`${element.first_name} ${element.last_name}`)
+
+        const employee = {};
+        employee.id = element.id;
+        employee.fullName = `${element.first_name} ${element.last_name}`;
+        employeesArr.push(employee)
+
     };
 
-    choices.push(null);
+    // console.log(choices);
 
-    console.log(choices);
+   return employeesArr;
 };
 
 const addEmployee = async () => {
 
     const roleChoices = await createAddEmployeeRoleChoices();
-    // const managerChoices = createAddEmployeeManagerChoices();
+    const employeesArr = await createEmployeeArray();
+    const managerChoices = []
+
+    for (const element of employeesArr) {
+        managerChoices.push(element.fullName);
+    };
 
     const newEmployeeQuestions = [
         {
@@ -198,24 +216,22 @@ const addEmployee = async () => {
             name: 'role',
             choices: roleChoices
         },
-        // {
-        //     type: 'list',
-        //     message: "Who is the employee's manager?",
-        //     name: 'manager',
-        //     choices: ""
-        // },
+        {
+            type: 'list',
+            message: "Who is the employee's manager?",
+            name: 'manager',
+            choices: managerChoices
+        },
         
-
     ];
 
-    const {firstName, lastName, role} = await inquirer.prompt(newEmployeeQuestions);
+    const {firstName, lastName, role, manager} = await inquirer.prompt(newEmployeeQuestions);
 
-    console.log(firstName, lastName, role);
+    console.log(firstName, lastName, role, manager);
 };
 
 // stand-in init function
-// askNextAction();
+askNextAction();
 
-createAddEmployeeManagerChoices();
 
 
