@@ -49,7 +49,7 @@ const askNextAction = async () => {
         case "Add an Employee":
             return addEmployee();
 
-        case "Update Employee Role":
+        case "Update an Employee Role":
             return updateEmployeeRole();
 
         case "View All Roles":
