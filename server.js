@@ -65,7 +65,7 @@ const askNextAction = async () => {
             return addDepartment();
 
         case "Quit":
-            return;
+            return quitApp();
     };
 };
 
@@ -126,7 +126,7 @@ const addRole = async () => {
             name: 'title',
         },
         {
-            type: 'input',
+            type: 'number',
             message: "What is this role's salary?",
             name: 'salary',
         },
@@ -309,11 +309,30 @@ const updateEmployeeRole = async () => {
     return askNextAction();
 };
 
+const init = () => {
 
+    console.log(`
+--------------------------------------
+     _____       ___  ___   _____  
+    | ____|     /   |/   | /  ___/ 
+    | |__      / /|   /| | | |___  
+    |  __|    / / |__/ | | \\____ \\ 
+    | |___   / /       | |  ___| | 
+    |_____| /_/        |_| /_____/ 
+--------------------------------------
+    Employee Management System
+--------------------------------------   
+    `)
 
-// stand-in init function
-askNextAction();
+    askNextAction();
+};
 
+const quitApp = () => {
+    console.log("Goodbye");
+    process.exit();
+};
+
+init();
 
 
 
