@@ -37,7 +37,6 @@ const nextActionList = [
     }
 ];
 
-
 const askNextAction = async () => {
     const nextActionAnswer = await inquirer.prompt(nextActionList);
 
@@ -51,7 +50,7 @@ const askNextAction = async () => {
             return addEmployee();
 
         case "Update Employee Role":
-            break;
+            return updateEmployeeRole();
 
         case "View All Roles":
             return viewAllRoles();
@@ -116,21 +115,10 @@ const addDepartment = async () => {
     return askNextAction;
 };
 
-const createAddRoleDepartmentChoices = async () => {
-    const results = await query("SELECT id, name AS department FROM departments;");
-    const choices = [];
-
-    for (const element of results) {
-        choices.push(element.department)
-    };
-
-    return choices
-};
-
 const addRole = async () => {
-
+    
     const choices = await createAddRoleDepartmentChoices();
-
+    
     const newRoleQuestions = [
         {
             type: 'input',
@@ -149,65 +137,45 @@ const addRole = async () => {
             choices: choices
         },
     ];
-
+    
     const {title, salary, department} = await inquirer.prompt(newRoleQuestions);
-
+    
     const departmentQuery = await query(`SELECT id FROM departments WHERE name = (?)`, department );
     const departmentId = departmentQuery[0].id
-
+    
     await query(`INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)`, [title, parseInt(salary), departmentId]);
     await viewAllRoles();
     return askNextAction();
 };
 
-const createAddEmployeeRoleChoices = async () => {
-    const results = await query("SELECT id, title FROM roles;");
-    const rolesArr = [];
-    
-    for (const element of results) {
-        const role = {};
-        role.id = element.id;
-        role.title = element.title;
-        rolesArr.push(role);
-    };
-    
-    return rolesArr
-};
-
-const createAddEmployeeManagerChoices = async () => {
-
-    const results = await query("SELECT * FROM employees");
-    const employeesArr = [];
+const createAddRoleDepartmentChoices = async () => {
+    const results = await query("SELECT id, name AS department FROM departments;");
+    const choices = [];
 
     for (const element of results) {
-
-        const employee = {};
-        employee.id = element.id;
-        employee.fullName = `${element.first_name} ${element.last_name}`;
-        employeesArr.push(employee)
-
+        choices.push(element.department)
     };
 
-   return employeesArr;
+    return choices
 };
 
 const addEmployee = async () => {
-
-    const rolesArr = await createAddEmployeeRoleChoices();
-    const employeesArr = await createAddEmployeeManagerChoices();
+    
+    const rolesArr = await createRoleChoices();
+    const employeesArr = await createEmployeeChoices();
     const roleChoices = [];
     const managerChoices = [];
-
+    
     for (const element of rolesArr) {
         roleChoices.push(element.title);
     };
-
+    
     for (const element of employeesArr) {
         managerChoices.push(element.fullName);
     };
 
     managerChoices.push("None");
-
+    
     const newEmployeeQuestions = [
         {
             type: 'input',
@@ -233,18 +201,18 @@ const addEmployee = async () => {
         },
         
     ];
-
+    
     const {firstName, lastName, role, manager} = await inquirer.prompt(newEmployeeQuestions);
-
+    
     let managerId;
     let roleId;
-
+    
     for (const element of rolesArr) {
         if (role === element.title) {
             roleId = element.id
         }
     };
-
+    
     for (const element of employeesArr) {
         if (manager === element.fullName) {
             managerId = element.id
@@ -252,17 +220,100 @@ const addEmployee = async () => {
             managerId = null;
         }
     };
-
-    console.log(`manager id type = ${typeof managerId}`);
-    console.log(`role id type = ${typeof roleId}`);
-
+    
     await query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [firstName.trim(), lastName.trim(), roleId, managerId]);
     await viewAllEmployees();
     return askNextAction();
 };
 
+const createRoleChoices = async () => {
+    const results = await query("SELECT id, title FROM roles;");
+    const rolesArr = [];
+    
+    for (const element of results) {
+        const role = {};
+        role.id = element.id;
+        role.title = element.title;
+        rolesArr.push(role);
+    };
+    
+    return rolesArr
+};
+
+const createEmployeeChoices = async () => {
+
+    const results = await query("SELECT * FROM employees");
+    const employeesArr = [];
+
+    for (const element of results) {
+
+        const employee = {};
+        employee.id = element.id;
+        employee.fullName = `${element.first_name} ${element.last_name}`;
+        employeesArr.push(employee)
+
+    };
+
+   return employeesArr;
+};
+
+const updateEmployeeRole = async () => {
+
+    const rolesArr = await createRoleChoices();
+    const employeesArr = await createEmployeeChoices();
+    const roleChoices = [];
+    const employeeChoices = [];
+
+    for (const element of rolesArr) {
+        roleChoices.push(element.title);
+    };
+
+    for (const element of employeesArr) {
+        employeeChoices.push(element.fullName);
+    };
+
+    const updateEmployeeQuestions = [
+        {
+            type: 'list',
+            message: "Which employee would you like to update?",
+            name: 'employee',
+            choices: employeeChoices
+        },
+        {
+            type: 'list',
+            message: "What is the employee's new role?",
+            name: 'role',
+            choices: roleChoices
+        },
+        
+    ];
+
+    const {employee, role} = await inquirer.prompt(updateEmployeeQuestions);
+    let employeeId;
+    let roleId;
+
+    for (const element of employeesArr) {
+        if (employee === element.fullName) {
+            employeeId = element.id
+        }
+    };
+
+    for (const element of rolesArr) {
+        if (role === element.title) {
+            roleId = element.id
+        }
+    };
+
+    await query(`UPDATE employees SET role_id = (?) WHERE id = (?)`, [roleId, employeeId]);
+    await viewAllEmployees();
+    return askNextAction();
+};
+
+
+
 // stand-in init function
 askNextAction();
+
 
 
 
