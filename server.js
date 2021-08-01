@@ -253,6 +253,9 @@ const addEmployee = async () => {
         }
     };
 
+    console.log(`manager id type = ${typeof managerId}`);
+    console.log(`role id type = ${typeof roleId}`);
+
     await query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [firstName.trim(), lastName.trim(), roleId, managerId]);
     await viewAllEmployees();
     return askNextAction();
