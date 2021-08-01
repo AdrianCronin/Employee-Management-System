@@ -94,7 +94,9 @@ const viewAllEmployees = async () => {
 
     JOIN departments ON roles.department_id = departments.id
 
-    LEFT JOIN employees e2 ON e2.id = e1.manager_id;`);
+    LEFT JOIN employees e2 ON e2.id = e1.manager_id
+    
+    ORDER BY e1.id;`);
     console.table(results);
     return askNextAction();
 };
@@ -160,17 +162,19 @@ const addRole = async () => {
 
 const createAddEmployeeRoleChoices = async () => {
     const results = await query("SELECT id, title FROM roles;");
-    const choices = [];
+    const rolesArr = [];
     
     for (const element of results) {
-        choices.push(element.title)
+        const role = {};
+        role.id = element.id;
+        role.title = element.title;
+        rolesArr.push(role);
     };
     
-    return choices
+    return rolesArr
 };
 
-// TODO: Finish this
-const createEmployeeArray = async () => {
+const createAddEmployeeManagerChoices = async () => {
 
     const results = await query("SELECT * FROM employees");
     const employeesArr = [];
@@ -184,20 +188,25 @@ const createEmployeeArray = async () => {
 
     };
 
-    // console.log(choices);
-
    return employeesArr;
 };
 
 const addEmployee = async () => {
 
-    const roleChoices = await createAddEmployeeRoleChoices();
-    const employeesArr = await createEmployeeArray();
-    const managerChoices = []
+    const rolesArr = await createAddEmployeeRoleChoices();
+    const employeesArr = await createAddEmployeeManagerChoices();
+    const roleChoices = [];
+    const managerChoices = [];
+
+    for (const element of rolesArr) {
+        roleChoices.push(element.title);
+    };
 
     for (const element of employeesArr) {
         managerChoices.push(element.fullName);
     };
+
+    managerChoices.push("None");
 
     const newEmployeeQuestions = [
         {
@@ -227,7 +236,26 @@ const addEmployee = async () => {
 
     const {firstName, lastName, role, manager} = await inquirer.prompt(newEmployeeQuestions);
 
-    console.log(firstName, lastName, role, manager);
+    let managerId;
+    let roleId;
+
+    for (const element of rolesArr) {
+        if (role === element.title) {
+            roleId = element.id
+        }
+    };
+
+    for (const element of employeesArr) {
+        if (manager === element.fullName) {
+            managerId = element.id
+        } else if (manager === "None") {
+            managerId = null;
+        }
+    };
+
+    await query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [firstName.trim(), lastName.trim(), roleId, managerId]);
+    await viewAllEmployees();
+    return askNextAction();
 };
 
 // stand-in init function
