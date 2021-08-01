@@ -25,13 +25,13 @@ const nextActionList = [
         message:'What would you like to do?',
         name:'choice',
         choices: [
-            "View All Employees",
-            "Add an Employee",
-            "Update Employee Role",
-            "View All Roles",
-            "Add a Role",
             "View All Departments",
+            "View All Roles",
+            "View All Employees",
             "Add a Department",
+            "Add a Role",
+            "Add an Employee",
+            "Update an Employee Role",
             "Quit"
         ]
     }
